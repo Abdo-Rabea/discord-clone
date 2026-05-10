@@ -11,7 +11,7 @@ function App() {
       <div className="text-2xl font-bold text-indigo-500">
         hello from front-end
       </div>
-      <Button variant="outline" className="mt-4">
+      <Button variant="ghost" className="mt-4">
         Button
       </Button>
     </>
