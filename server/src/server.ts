@@ -1,5 +1,5 @@
-const { Pool } = require("pg");
-require("dotenv/config");
+﻿import "dotenv/config";
+import { prisma } from "./utils/prismaClient";
 import app from "./app";
 
 process.on("uncaughtException", (err) => {
@@ -8,23 +8,32 @@ process.on("uncaughtException", (err) => {
 });
 
 // Database connection
-console.log(process.env.DATABASE_URL);
-const databaseUrl = process.env.DATABASE_URL;
-if (!databaseUrl) {
-  console.error("DATABASE_URL is not set");
-  process.exit(1);
-}
-const pool = new Pool({ connectionString: databaseUrl });
+prisma
+  .$connect()
+  .then(() => {
+    console.log("Prisma connected");
+  })
+  .catch((err) => {
+    console.error("Error connecting to Prisma", err);
+    process.exit(1);
+  });
 
-// Start the server
+// server setup
 const port: number = Number(process.env.PORT) || 3000;
 const server = app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
+});
+server.on("error", (err) => {
+  console.error("Server error", err);
+  process.exit(1);
 });
 
 process.on("unhandledRejection", (err: NodeJS.ErrnoException) => {
   console.log("Exception💥: ", err.name, "-", err.message);
   server.close(() => {
-    process.exit(1);
+    prisma
+      .$disconnect()
+      .catch(() => null)
+      .finally(() => process.exit(1));
   });
 });

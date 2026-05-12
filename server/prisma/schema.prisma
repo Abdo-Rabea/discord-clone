@@ -1,0 +1,161 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// User Management
+model User {
+  id                String    @id @default(cuid())
+  username          String    @unique
+  email             String    @unique
+  password          String
+  created_at        DateTime  @default(now())
+  
+  profile           Profile?
+  messages          Message[]
+  directMessagesSent DirectMessage[] @relation("sender")
+  directMessagesReceived DirectMessage[] @relation("recipient")
+  members           Member[]
+  // to show who created server-specific roles
+  rolesCreated      Role[]
+  serversOwned      Server[]
+}
+
+model Profile {
+  id        Int     @id @default(autoincrement())
+  userId    String  @unique
+  name      String?
+  avatar    String?
+  bio       String?
+  
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Server/Community
+model Server {
+  id        String   @id @default(cuid())
+  name      String
+  icon      String?
+  image      String?
+  inviteCode String   @unique
+  ownerId   String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  // inviteCode String @unique
+
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  
+  channels  Channel[]
+  members   Member[]
+  roles     Role[]
+}
+
+model Member {
+  id        String   @id @default(cuid())
+  userId    String
+  serverId  String
+  joinedAt  DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  server    Server   @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  roles     Role[]
+  messages  Message[]
+  channels  ChannelMember[]
+  
+  @@unique([userId, serverId])
+}
+
+model Role {
+  id        String   @id @default(cuid())
+  name      String
+  color     String?
+  permissions String?
+  
+  // Discriminator: null = Global, has value = Server-specific
+  serverId  String?
+  
+  // Track who created server-specific roles
+  createdBy String?
+  
+  created_at DateTime @default(now())
+  
+  server    Server?   @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  creator   User?     @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+  members   Member[]
+}
+
+// Channels & Messages
+enum ChannelType {
+  TEXT
+  AUDIO
+  VIDEO
+}
+model Channel {
+  id        String   @id @default(cuid())
+  name      String
+  type      ChannelType @default(TEXT)
+  serverId  String
+  created_at DateTime @default(now())
+  
+  server    Server   @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  messages  Message[]
+  members   ChannelMember[]
+}
+
+model ChannelMember {
+  id        String   @id @default(cuid())
+  memberId  String
+  channelId String
+  joinedAt  DateTime @default(now())
+  
+  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  
+  @@unique([memberId, channelId])
+}
+
+// todo: For later
+model Message {
+  id        String    @id @default(cuid())
+  content   String
+  channelId String
+  authorId  String
+  memberId  String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  
+  channel   Channel   @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  member    Member    @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  attachments Attachment[]
+}
+
+model Attachment {
+  id        String   @id @default(cuid())
+  url       String
+  filename  String
+  filesize  Int
+  messageId String
+  created_at DateTime @default(now())
+  
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+}
+
+
+// Direct Messages
+model DirectMessage {
+  id        String   @id @default(cuid())
+  content   String
+  senderId  String
+  recipientId String
+  created_at DateTime @default(now())
+  
+  sender    User     @relation("sender", fields: [senderId], references: [id], onDelete: Cascade)
+  recipient User     @relation("recipient", fields: [recipientId], references: [id], onDelete: Cascade)
+}
+
+
