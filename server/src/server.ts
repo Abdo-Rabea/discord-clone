@@ -1,5 +1,5 @@
 ﻿import "dotenv/config";
-import { prisma } from "./utils/prismaClient";
+import { db } from "./utils/prismaClient";
 import app from "./app";
 
 process.on("uncaughtException", (err) => {
@@ -8,8 +8,7 @@ process.on("uncaughtException", (err) => {
 });
 
 // Database connection
-prisma
-  .$connect()
+db.$connect()
   .then(() => {
     console.log("Prisma connected");
   })
@@ -31,8 +30,7 @@ server.on("error", (err) => {
 process.on("unhandledRejection", (err: NodeJS.ErrnoException) => {
   console.log("Exception💥: ", err.name, "-", err.message);
   server.close(() => {
-    prisma
-      .$disconnect()
+    db.$disconnect()
       .catch(() => null)
       .finally(() => process.exit(1));
   });

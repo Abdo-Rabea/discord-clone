@@ -1,0 +1,16 @@
+import { NextFunction, Request, Response } from "express";
+
+type AsyncRequestHandler = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => Promise<void>;
+
+const catchAsync = (fn: AsyncRequestHandler) => {
+  // so the middleware function returned by catchAsync is not async but call an async function which return promise you catch, which really makes it async (it can be async await and encabsulate the fn calling with try catch block)
+  return (req: Request, res: Response, next: NextFunction) => {
+    fn(req, res, next).catch((err: Error) => next(err)); // this will catch any error that occurs in the async function and pass it to the next middleware function, which is the global error handling middleware function defined in app.js. this way we can handle all the errors in one place and send a response to the client with the error message and status code.
+  };
+};
+
+export default catchAsync;
