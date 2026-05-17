@@ -1,28 +1,15 @@
 import express, { NextFunction } from "express";
+import cookieParser from "cookie-parser";
 import userRoutes from "./routes/userRoutes";
+import { globalErrorHandler } from "./controllers/errorController";
 
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api/v1/users", userRoutes);
 
 // global error handling middleware function
-app.use(
-  (
-    err: any,
-    req: express.Request,
-    res: express.Response,
-    next: NextFunction,
-  ) => {
-    console.error("Global error handling middleware function called");
-    console.error(err.message);
-
-    res.status(err.statusCode || 500).json({
-      status: err.status || "error",
-      message: err.message || "Internal Server Error",
-      errorStack: err.stack,
-    });
-  },
-);
+app.use(globalErrorHandler);
 export default app;

@@ -6,6 +6,7 @@ import * as EmailValidator from "email-validator";
 import { AuthRequest } from "../types/auth";
 import { AppError } from "../utils/appError";
 import catchAsync from "../utils/catchAsync";
+import { User } from "../types/user";
 
 // Generate JWT Token
 const generateToken = (userId: string) => {
@@ -17,6 +18,39 @@ const generateToken = (userId: string) => {
   });
 };
 
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  expires: new Date(
+    Date.now() +
+      Number(process.env.JWT_COOKIE_EXPIRES_IN) * 24 * 60 * 60 * 1000,
+  ),
+};
+
+const generateSendToken = (
+  user: User,
+  statusCode: number,
+  message: string,
+  res: Response,
+) => {
+  // Generate token
+  const token = generateToken(user.id);
+
+  // create cookie
+
+  res.cookie("token", token, cookieOptions);
+
+  res.status(statusCode).json({
+    message: message,
+    token,
+    user: {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      profile: user.profile,
+    },
+  });
+};
 // SIGNUP
 export const signup = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -66,19 +100,7 @@ export const signup = catchAsync(
       include: { profile: true },
     });
 
-    // Generate token
-    const token = generateToken(user.id);
-
-    res.status(201).json({
-      message: "User created successfully",
-      token,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        profile: user.profile,
-      },
-    });
+    generateSendToken(user, 201, "User created successfully", res);
   },
 );
 
@@ -107,19 +129,7 @@ export const login = catchAsync(
       return next(new AppError("Invalid email or password", 401));
     }
 
-    // Generate token
-    const token = generateToken(user.id);
-
-    res.status(200).json({
-      message: "Login successful",
-      token,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        profile: user.profile,
-      },
-    });
+    generateSendToken(user, 201, "Login successful", res);
   },
 );
 
@@ -131,6 +141,7 @@ export const refreshToken = catchAsync(
     }
 
     const token = generateToken(req.userId);
+    res.cookie("token", token, cookieOptions);
 
     res.status(200).json({
       message: "Token refreshed successfully",
