@@ -149,3 +149,14 @@ export const refreshToken = catchAsync(
     });
   },
 );
+
+// LOGOUT
+export const logout = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    res.clearCookie("token");
+
+    res.status(200).json({
+      message: "Logged out successfully",
+    });
+  },
+);
