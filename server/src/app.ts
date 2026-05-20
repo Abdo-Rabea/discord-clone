@@ -1,5 +1,6 @@
 import express, { NextFunction } from "express";
 import cookieParser from "cookie-parser";
+import morgan from "morgan";
 import userRoutes from "./routes/userRoutes";
 import { globalErrorHandler } from "./controllers/errorController";
 
@@ -7,6 +8,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(morgan("dev"));
 
 app.use("/api/v1/users", userRoutes);
 
