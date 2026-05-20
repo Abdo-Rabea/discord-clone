@@ -15,19 +15,12 @@ export function CallToAction() {
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Link to="/signup">
-            <Button
-              size="lg"
-              className="bg-brand-primary hover:bg-brand-accent w-full sm:w-auto"
-            >
+            <Button size="lg" variant="primary">
               Create Your Account
             </Button>
           </Link>
           <Link to="/login">
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-border text-text-secondary hover:bg-surface-tertiary hover:text-foreground w-full sm:w-auto"
-            >
+            <Button size="lg" variant="outline">
               Already a Member? Sign In
             </Button>
           </Link>

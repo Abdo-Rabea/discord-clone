@@ -6,15 +6,9 @@ import {
   MessageSquare,
   Share2,
 } from "lucide-react";
+import Feature, { type FeatureProps } from "./Feature";
 
-interface Feature {
-  id: string;
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}
-
-const features: Feature[] = [
+const features: FeatureProps[] = [
   {
     id: "1",
     icon: <Zap className="h-8 w-8 text-brand-100" />,
@@ -74,18 +68,13 @@ export function FeaturesShowcase() {
         {/* Features Grid */}
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature) => (
-            <div
+            <Feature
               key={feature.id}
-              className="rounded-lg border border-border bg-background p-6 backdrop-blur-sm hover:border-border hover:bg-surface-tertiary transition-all duration-300"
-            >
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-surface-tertiary">
-                {feature.icon}
-              </div>
-              <h3 className="mb-2 text-lg font-semibold text-foreground">
-                {feature.title}
-              </h3>
-              <p className="text-text-secondary">{feature.description}</p>
-            </div>
+              id={feature.id}
+              icon={feature.icon}
+              title={feature.title}
+              description={feature.description}
+            />
           ))}
         </div>
       </div>

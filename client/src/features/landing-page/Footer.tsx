@@ -1,3 +1,4 @@
+import LogoMini from "@/ui/LogoMini";
 import { Heart, Globe, Mail } from "lucide-react";
 
 export function Footer() {
@@ -126,14 +127,9 @@ export function Footer() {
 
         {/* Bottom Section */}
         <div className="border-t border-border pt-8 flex flex-col sm:flex-row items-center justify-between">
-          <div className="flex items-center gap-2 mb-4 sm:mb-0">
-            <div className="h-6 w-6 rounded bg-brand-primary flex items-center justify-center">
-              <span className="text-white font-bold text-xs">#</span>
-            </div>
-            <span className="text-foreground font-semibold">Discord Clone</span>
-          </div>
+          <LogoMini />
           <p className="text-text-tertiary text-sm">
-            © 2024 Discord Clone. All rights reserved.
+            © 2026 Discord Clone - AbdElrahman Rabea. All rights reserved.
           </p>
         </div>
       </div>

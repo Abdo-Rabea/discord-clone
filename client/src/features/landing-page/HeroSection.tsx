@@ -32,20 +32,13 @@ export function HeroSection() {
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Link to="/signup">
-            <Button
-              size="lg"
-              className="bg-brand-primary hover:bg-brand-accent"
-            >
+            <Button size="lg" variant="primary">
               Get Started
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
           <Link to="/login">
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-border text-text-secondary hover:bg-surface-secondary hover:text-foreground"
-            >
+            <Button size="lg" variant="outline">
               Sign In
             </Button>
           </Link>
